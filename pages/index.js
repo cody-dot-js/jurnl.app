@@ -1,14 +1,57 @@
+import { signIn, useSession } from "next-auth/client";
 import Head from "next/head";
 import styles from "../styles/Home.module.css";
 
 export default function Home() {
+  const [session, loading] = useSession();
+
   return (
     <div className={styles.container}>
       <Head>
         <title>Create Next App</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-
+      <header>
+        {!session && (
+          <>
+            <span>You are not signed in</span>
+            <a
+              href="/api/auth/signin"
+              onClick={(e) => {
+                e.preventDefault();
+                signIn();
+              }}
+            >
+              Sign In
+            </a>
+          </>
+        )}
+        {session && (
+          <>
+            {session.user.image && (
+              <span
+                style={{ backgroundImage: `url(${session.user.image})` }}
+                className={styles.avatar}
+              />
+            )}
+            <span className={styles.signedInText}>
+              <small>Signed in as</small>
+              <br />
+              <strong>{session.user.email || session.user.name}</strong>
+            </span>
+            <a
+              href={`/api/auth/signout`}
+              className={styles.button}
+              onClick={(e) => {
+                e.preventDefault();
+                signOut();
+              }}
+            >
+              Sign out
+            </a>
+          </>
+        )}
+      </header>
       <main className={styles.main}>
         <h1 className={styles.title}>
           Welcome to <a href="https://nextjs.org">Next.js!</a>
